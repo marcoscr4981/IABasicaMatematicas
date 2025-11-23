@@ -1,29 +1,55 @@
-# Descrición
+# IA Básica Matemáticas
 
-Emprega este arquivo para describir os cambios do teu proxecto.
+## Descripción
 
-Utiliza o formato en markdown coas marcas básicas que aparcen no seguinte exemplo:
+He creado una nueva escena `Ejercicio` con una GameObject `Capsule`, que es el objeto que controla el jugador y tres GameObject `Sphere`, que son los objetos que siguen al jugador.
 
-# Título principal
-## Subtítulo
+## Jugador
 
-Texto normal con **negriña** e *cursiva*.
+Utiliza la clase `VillagerDrive` para sus movimientos.
 
-- Lista 1
-- Lista 2
+Se le ha añadido la `Main Camera` al GameObject, así cuando el jugador mueve el objeto, le va siguiendo la cámara.
 
-[Ligazón](https://exemplo.com)
+![Cámara siendo hija del Game Object del jugador](img/camara.png)
 
+Lo único que se ha modificado en este script son los parámetros `public` por `SerializeField`.
+
+## Esferas (Sphere)
+
+Utiliza la clase `PigMove` como referencia.
+
+A la posición inicial de cada esfera se ha añadido un `Empty Object` para indicar su posición inicial. El script obtiene el Game Object desde el Inspector.
 
 ```csharp
-using UnityEngine;
-
-public class OlaMundo : MonoBehaviour
-{
-    void Start()
-    {
-        Debug.Log("Ola, mundo desde C#!");
-    }
-}
-
+[SerializeField] GameObject startingPosition;
 ```
+
+Se ha puesto un limitador de detección.
+
+```csharp
+// Si el objeto del jugador está a mas de 1f y menos de 8f unidades
+if (direction.magnitude > 1 && direction.magnitude < 8f)
+{
+    Search(direction);
+}
+// Si el objeto del jugador está a mas o igual de 8f unidades
+else if (direction.magnitude >= 8f)
+{
+    Search(startingPosition.transform.position - this.transform.position);
+}
+```
+
+- **Si el jugador está a mas de 1f y menos de 8f:** Las esferas siguen al jugador y se detienen cuando están a menos de 1f.
+- **Si el jugador está a mas de 8f unidades:** Las esferas vuelven al punto de partida.
+
+Para refactorizar el script, he creado el siguiente método:
+
+```csharp
+void Search(Vector3 dir)
+{
+    Vector3 velocity = dir.normalized * speed * Time.deltaTime;
+    this.transform.position = this.transform.position + velocity;
+}
+```
+
+Este método tiene como parámetro la dirección que debe seguir cada esfera.
